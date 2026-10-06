@@ -31,3 +31,11 @@ Visit `/admin`. Your generated private admin key is in the ignored local `.env` 
 ## Implementation references
 
 [MediaPipe web face tracking](https://developers.google.com/edge/mediapipe/solutions/vision/face_landmarker/web_js), [Stripe signature verification](https://docs.stripe.com/webhooks/signature), [Twilio message resource](https://www.twilio.com/docs/messaging/api/message-resource), [OpenAI Responses API](https://developers.openai.com/api/reference/resources/responses/methods/create).
+
+## Local preview error recovery
+
+`server.forwardConsole: false` prevents Vite 8.0.13's disconnected console-forwarding handler from generating repeated `send was called before connect` promise rejections. Runtime errors remain visible in browser DevTools and hot reloading remains enabled. Run `node scripts/check-dev.mjs` against the running local preview to verify the resolved Vite client configuration. Restart `npm run dev` and reload any tab that still contains the old Vite client after configuration changes. Camera inference failures now stop the stream and show a restart message.
+
+The current palette follows the supplied client-work screenshots: white, soft rose (#fff6f8), champagne gold (#b89e4c), rose enquiry accents (#c92759) and charcoal (#1a1a1a). The original reference folder is unchanged.
+
+[Vite console-forwarding disconnect issue](https://github.com/vitejs/vite/issues/22407) · [Vite forwarding configuration](https://v8.vite.dev/config/server-options#server-forwardconsole)

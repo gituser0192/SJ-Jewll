@@ -53,6 +53,9 @@ export default defineConfig(async ({ command }) => {
 
   return {
     server: {
+      // Vite 8.0.13's forwarding handler recursively rejects after a disconnect.
+      // Browser DevTools still reports runtime errors; HMR stays enabled.
+      forwardConsole: false,
       ...(managedLinux
         ? { host: "0.0.0.0", allowedHosts: ["terminal.local"] }
         : {}),
