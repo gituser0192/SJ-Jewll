@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1791322996902,
+      "tag": "0000_milky_venom",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791323196642,
+      "tag": "0001_fixed_mattie_franklin",
+      "breakpoints": true
+    }
+  ]
+}
