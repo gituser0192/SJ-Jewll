@@ -1,4 +1,4 @@
-export type Product={id:string;name:string;category:string;purity:string;description:string;image_url:string;kind:string;price_status:string};
+export type Product={id:string;name:string;category:string;purity:string;description:string;image_url:string;kind:string;price_status:string;published?:number;overlay_url?:string;ar_scale?:number;ar_offset?:number};
 export const categories=[['all','All masterpieces'],['gold','Gold treasures'],['silver','Pure silver'],['bespoke','Bespoke sets'],['flora-fauna','Flora & fauna']];
 export const starterProducts:Product[]=[
 {id:'sj-01',name:'The Emerald Muse',category:'gold',purity:'Gold & coloured stone · details on enquiry',description:'A deep teal stone suspended on a delicate golden chain.',image_url:'/images/gold.avif',kind:'necklace',price_status:'On request'},

@@ -6,9 +6,13 @@ A React App Router storefront, hosted with a Cloudflare-compatible Vinext build 
 
 Use Node 22.13+ and `npm run install:ci`, then `npm run build`. Generate migrations with `npm run db:generate` after schema changes. For local D1 apply the two SQL files in `drizzle/` in order using Wrangler's `d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file <migration>` command. `npm run dev` starts the preview. `node scripts/check.mjs` runs the API smoke check against the local URL (override with `SJ_BASE_URL`). The check uses fabricated local-only contacts and never sends real SMS or payments.
 
-## Admin
+## Admin portal
 
-Visit `/admin`. Your generated private admin key is in the ignored local `.env` file under `ADMIN_TOKEN`; never share or commit it. The deployed secret is configured separately in Sites. The desk edits verified rates, product JSON and lead status. No verified rates are seeded. The ticker updates every minute, labels the supplied date, and warns when older than a day.
+Visit /admin and sign in with the authorised ChatGPT account, hs2162943@gmail.com. The hosted ADMIN_EMAIL secret restricts every management API request to this account. The old shared admin key is no longer used. Local-only preview uses the starter's seedy@sites.test mock identity; it never applies to production.
+
+Use Collection to add a piece, upload/replace/remove its photograph, edit the name and description below it, set material and price labels, and save as draft or publish. Remove piece asks for confirmation. Drafts and removed pieces are excluded from the storefront. Uploaded images are retained in R2 after removing a catalogue entry, avoiding deletion of files that may be reused. A storage-cleanup workflow is not included.
+
+Use Consultations for enquiries and status updates. Use Gold & silver rates to enter verified figures. Account changes require changing the hosted ADMIN_EMAIL secret and republishing.
 
 ## Live service configuration
 
@@ -22,7 +26,7 @@ Visit `/admin`. Your generated private admin key is in the ignored local `.env` 
 ## Intentional limits
 
 - Photos are supplied by the user; six distinct images are copied locally. Product names and categories are illustrative. Hallmarks, actual material, prices, stock and addresses are not invented. The requested SJ crest and Royal Polki bridal photo were not supplied.
-- The camera tracks facial landmarks locally using MediaPipe. It renders approximate necklace and earring silhouettes rather than exact photographed products or physically accurate 3D models. Ring try-on is excluded from a face tracker. Camera/device performance and alignment require a real-device check. External model and WASM loading requires an internet connection.
+- The camera now renders photographic transparent PNG cutouts with smoothed position/scale/roll, turn-dependent earring visibility and scene-brightness adjustment. The initial gemstone earring and pearl necklace cutouts were AI-prepared from the supplied photographs; they are illustrative reconstructions rather than exact scans. Admins can upload product-accurate PNG cutouts and calibrate their size and placement. A flat image is not a 3D model and will not perfectly handle side views, hair occlusion or neck movement. Live fitting needs a real-device check. The camera has local fit controls and a private, downloadable snapshot; video and snapshots are not uploaded.
 - `SJ-2036-POLKI-8842` is a sample pedigree record with SHA-256 fingerprinting, not a real blockchain or holographic scan. Artisan/signature/alloy data is explicitly simulated.
 - Wishlist persists in D1, keyed by an HttpOnly visitor cookie. It survives reloads on the same browser, not across devices. Consultation leads are durable; the admin key controls CRM access.
 - AI, SMS and payments have adapters but are not live-tested without merchant credentials. This is a reviewable first application, not a certified production commerce system. Set the real catalogue, privacy/retention policy, verified shop rates, merchant terms and service credentials before opening to customers.
@@ -39,3 +43,9 @@ Visit `/admin`. Your generated private admin key is in the ignored local `.env` 
 The current palette follows the supplied client-work screenshots: white, soft rose (#fff6f8), champagne gold (#b89e4c), rose enquiry accents (#c92759) and charcoal (#1a1a1a). The original reference folder is unchanged.
 
 [Vite console-forwarding disconnect issue](https://github.com/vitejs/vite/issues/22407) · [Vite forwarding configuration](https://v8.vite.dev/config/server-options#server-forwardconsole)
+
+## Admin and camera checks
+
+Run `node scripts/check-admin.mjs` against the local preview for account authorisation, forged-header rejection, create/edit/remove, draft visibility, rendered account gate, R2 photo upload/read, unsafe image rejection, CSRF and photographic pose/rendering checks. It creates and removes a fabricated local piece and retains its uploaded test file locally. No production contacts, SMS or payments are used. Browser inspection was unavailable during this update because the computer-use tool could not verify the current Windows browser URL. Live camera alignment and user-interface visual QA are therefore unverified.
+
+Initial cutout assets: `public/tryon/botanical-drop.png` and `public/tryon/pearl-necklace.png`, created with the built-in ImageGen tool. Prompts: extract one photographed blue gemstone drop earring vertically on transparent alpha; isolate the pearl necklace as a front-facing open U-shaped strand on transparent alpha. Both preserve the supplied photographs as design references.

@@ -10,8 +10,9 @@ const cert=await request('pedigree?code=SJ-2036-POLKI-8842');assert.equal(cert.s
 assert.equal((await request('consultations',{fullName:'A',phone:'bad',interest:'Test',consent:true})).status,400);
 assert.equal((await request('consultations',{fullName:'Local QA',phone:'0000000000',interest:'QA only',prefDate:'2027-02-31',consent:true})).status,400);
 const lead=await request('consultations',{fullName:'Local QA',phone:'0000000000',interest:'QA only',message:'Fabricated local smoke test',consent:true});assert.equal(lead.status,201);assert.equal(lead.data.status,'PENDING');assert.equal(lead.data.smsSent,false);
-assert.equal((await request('admin')).status,401);assert.equal((await request('admin',{type:'rates',gold22k:1,silver925:1})).status,401);
+assert.equal((await request('admin')).status,403);assert.equal((await request('admin',{type:'rates',gold22k:1,silver925:1})).status,403);
 const guide=await request('concierge',{message:'Tell me about the heritage'});assert.equal(guide.status,200);assert.equal(guide.data.mode,'guide');assert.match(guide.data.answer,/1964/);
 assert.equal((await request('deposit',{leadId:lead.data.id})).status,503);
 const rejected=await fetch(base+'/api/wishlist',{method:'POST',headers:{Origin:'https://invalid.example','Content-Type':'application/json'},body:JSON.stringify({items:[]})});assert.equal(rejected.status,403);
 console.log('PASS: catalogue, persistent wishlist, sample certificates, consultation validation/save, guide, disabled deposits, admin protection and request-origin check.');
+
