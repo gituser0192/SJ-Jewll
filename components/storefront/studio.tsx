@@ -17,6 +17,7 @@ export default function Studio({products}:{products:Product[]}){
   const ticket=++generation.current;setBusy(true);setStatus('Preparing your photographic try-on…');let stream:MediaStream|undefined,tracker:any,frame=0,running=true;
   const dispose=()=>{running=false;cancelAnimationFrame(frame);stream?.getTracks().forEach(t=>t.stop());const old=tracker;tracker=undefined;old?.close();if(video.current)video.current.srcObject=null;const c=canvas.current;c?.getContext('2d')?.clearRect(0,0,c.width,c.height);};cleanup.current=dispose;
   try{
+   const session=await fetch('/api/session',{cache:'no-store'});if(session.status===401){window.location.assign('/login?next=%2Ftry-on');dispose();setBusy(false);return;}if(!session.ok)throw new Error('We could not check your sign-in. Please try again.');if(generation.current!==ticket){dispose();return;}
    if(!navigator.mediaDevices?.getUserMedia)throw new Error('Camera requires HTTPS and a supported browser.');
    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:960}},audio:false});if(generation.current!==ticket){dispose();return;}
    const v=video.current;if(!v)throw new Error('Camera preview unavailable.');v.srcObject=stream;await v.play();
