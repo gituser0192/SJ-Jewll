@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import ts from 'typescript';
+const source=ts.createSourceFile('admin-portal.tsx',readFileSync('components/storefront/admin-portal.tsx','utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+let layout;
+function visit(node){if(ts.isJsxElement(node)&&node.openingElement.attributes.properties.some(p=>ts.isJsxAttribute(p)&&p.name.text==='className'&&p.initializer?.text==='maison-admin'))layout=node;ts.forEachChild(node,visit);}visit(source);
+assert.ok(layout,'Admin layout must exist');
+const children=layout.children.filter(n=>ts.isJsxElement(n)||ts.isJsxSelfClosingElement(n)).map(n=>(ts.isJsxElement(n)?n.openingElement:n).tagName.getText(source));
+assert.deepEqual(children,['aside','div','AlertDialog'],'The sidebar and workspace must occupy the two grid columns. Notifications must stay outside.');
+assert.ok(ts.isJsxFragment(layout.parent),'Notifications must be siblings of the grid, not grid items.');
+console.log('PASS: admin grid contains only sidebar/workspace and portalled dialog; notifications cannot displace either column.');
