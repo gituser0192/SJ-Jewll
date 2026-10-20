@@ -1,4 +1,4 @@
-export type Product={id:string;name:string;category:string;purity:string;description:string;image_url:string;kind:string;price_status:string;published?:number;overlay_url?:string;ar_scale?:number;ar_offset?:number};
+export type Product={id:string;name:string;category:string;purity:string;description:string;image_url:string;kind:string;price_status:string;published?:number;overlay_url?:string;ar_scale?:number;ar_offset?:number;price_paise?:number;stock?:number;reserved?:number};
 export const categories=[['all','All masterpieces'],['gold','Gold treasures'],['silver','Pure silver'],['bespoke','Bespoke sets'],['flora-fauna','Flora & fauna']];
 export const starterProducts:Product[]=[
 {id:'sj-01',name:'The Emerald Muse',category:'gold',purity:'Gold & coloured stone · details on enquiry',description:'A deep teal stone suspended on a delicate golden chain.',image_url:'/images/gold.avif',kind:'necklace',price_status:'On request'},
@@ -7,4 +7,4 @@ export const starterProducts:Product[]=[
 {id:'sj-04',name:'The Pearl Heirloom',category:'bespoke',purity:'Pearls · clasp specifications on enquiry',description:'An elegant strand for celebrations and everyday rituals.',image_url:'/images/necklace.avif',kind:'necklace',price_status:'On request'},
 {id:'sj-05',name:'The Crescent Story',category:'gold',purity:'Layered chains · details on enquiry',description:'A crescent and a coloured pendant in effortless layers.',image_url:'/images/pendant.avif',kind:'necklace',price_status:'On request'},
 {id:'sj-06',name:'The Sculpted Hoops',category:'silver',purity:'Illustrative silver collection · purity unverified',description:'Sculptural hoops with a warm, polished finish.',image_url:'/images/silver.avif',kind:'earrings',price_status:'On request'}];
-export const whatsapp=(message:string)=>`https://wa.me/917027653802?text=${encodeURIComponent(message)}`;
+export const whatsapp=(message:string,phone='917027653802')=>`https://wa.me/${phone}?text=${encodeURIComponent(message)}`;

@@ -2,10 +2,12 @@
 import {useEffect,useRef,useState} from 'react';
 import {Camera,CameraOff,Download,SlidersHorizontal} from 'lucide-react';
 import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from '@/components/ui/select';
-import {Product,whatsapp} from '@/lib/catalog';
+import {Product} from '@/lib/catalog';
+import {useSite} from './site-provider';
 import {drawJewellery,facePose,smoothPose,type Pose} from '@/lib/tryon-render';
 async function loadCutout(url:string){const image=new Image();image.src=url;await image.decode();if(image.width>4096||image.height>4096)throw new Error('This try-on image is too large. Ask the shop to upload a smaller cutout.');const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;const ctx=canvas.getContext('2d')!;ctx.drawImage(image,0,0);const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;let left=canvas.width,top=canvas.height,right=0,bottom=0;for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++)if(pixels[(y*canvas.width+x)*4+3]>24){left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x);bottom=Math.max(bottom,y);}if(right<=left||bottom<=top)throw new Error('This cutout is empty. Choose another piece.');const output=document.createElement('canvas');output.width=right-left+1;output.height=bottom-top+1;output.getContext('2d')!.drawImage(canvas,left,top,output.width,output.height,0,0,output.width,output.height);return output;}
 export default function Studio({products}:{products:Product[]}){
+ const {whatsapp}=useSite();
  const video=useRef<HTMLVideoElement>(null),canvas=useRef<HTMLCanvasElement>(null),cleanup=useRef(()=>{}),generation=useRef(0),sprite=useRef<HTMLCanvasElement|null>(null),current=useRef<Product|null>(null),fit=useRef({scale:1,offset:0});
  const [active,setActive]=useState(false),[busy,setBusy]=useState(false),[assetBusy,setAssetBusy]=useState(false),[status,setStatus]=useState('Your camera stays on your device.'),[item,setItem]=useState(''),[fitScale,setFitScale]=useState(1),[fitOffset,setFitOffset]=useState(0),[adjust,setAdjust]=useState(false),[snapshot,setSnapshot]=useState('');
  const eligible=products.filter(p=>p.kind!=='ring'&&p.overlay_url);const piece=eligible.find(p=>p.id===item)??eligible[0];current.current=piece??null;fit.current={scale:fitScale,offset:fitOffset};
