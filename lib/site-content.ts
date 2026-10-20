@@ -10,7 +10,7 @@ export const contentSchema=z.object({
  shippingPolicy:paragraph,returnsPolicy:paragraph,privacyPolicy:paragraph,
  checkoutMode:z.literal('request'),deliveryEnabled:z.boolean(),shippingPaise:z.number().int().min(0).max(1000000),checkoutNote:paragraph,
  collections:z.array(z.object({id:z.string().regex(/^[a-z][a-z\d-]{0,39}$/),label:z.string().trim().min(2).max(60),description:z.string().trim().max(300)})).min(1).max(12)
-}).refine(c=>new Set(c.collections.map(x=>x.id)).size===c.collections.length,{message:'Collection identifiers must be unique.'});
+}).refine(c=>new Set(c.collections.map(x=>x.id)).size===c.collections.length,{message:'Collection identifiers must be unique.'}).refine(c=>c.collections.every(x=>x.id!=='all'),{message:'Choose a collection identifier other than all.'});
 export type SiteContent=z.infer<typeof contentSchema>;
 export const defaultContent:SiteContent={
  brandName:'Sheochand',monogram:'SJ',tagline:'JEWELLERY · EST. 1964',seoTitle:'Sheochand Jewellery | Since 1964',seoDescription:'Three generations of independent craftsmanship. Explore the collection and arrange your personal consultation.',announcement:'INDEPENDENT SINCE 1964 · TODAY’S BULLION RATES: PLEASE ENQUIRE',

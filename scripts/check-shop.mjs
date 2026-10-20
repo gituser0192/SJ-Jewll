@@ -18,6 +18,7 @@ function checkout(selection,extra={}){return {action:'checkout',requestKey:crypt
 try{
  assert.equal((await admin({type:'content',content:{...content,heroImage:'https://evil.example/image.png'}})).status,400);
  assert.equal((await admin({type:'content',content:{...content,collections:[content.collections[0],content.collections[0]]}})).status,400);
+ assert.equal((await admin({type:'content',content:{...content,collections:[{id:'all',label:'Reserved identifier',description:''}]}})).status,400);
  assert.equal((await admin({type:'content',content})).status,200);
  let html=await(await fetch(base+'/')).text();assert.ok(html.includes('LOCAL CMS TEST'));assert.ok(html.includes('Local CMS shop test'));
  assert.equal((await admin({type:'product',product:{...product,price_paise:99.99}})).status,400);
