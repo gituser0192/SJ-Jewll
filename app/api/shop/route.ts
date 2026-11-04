@@ -1,4 +1,4 @@
-import {getChatGPTUser} from '@/app/chatgpt-auth';
+import {getCustomerUser} from '@/lib/auth/user';
 import {database} from '@/db';
 import {limitedBody,sameOrigin} from '@/lib/admin';
 import {cart,expireOrders} from '@/lib/shop';
@@ -7,7 +7,7 @@ import type {StoreOrder} from '@/lib/shop-types';
 import {z} from 'zod';
 const json=(data:unknown,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'private, no-store'}});
 export async function GET(request:Request){try{
- const user=await getChatGPTUser();if(!user)return json({error:'Sign in to shop.'},401);
+ const user=await getCustomerUser();if(!user)return json({error:'Sign in to shop.'},401);
  await expireOrders();const db=database(),id=new URL(request.url).searchParams.get('id');
  if(id){const order=await db.query('SELECT * FROM sheochand.orders WHERE id=$1 AND owner_id=$2',[id,user.userId]).then(result=>result.rows[0]??null);return order?json({order}):json({error:'Order not found.'},404);}
  const [selection,orders,content]=await Promise.all([cart(user.userId),db.query('SELECT * FROM sheochand.orders WHERE owner_id=$1 ORDER BY created_at DESC LIMIT 100',[user.userId]),getSiteContent()]);
@@ -16,7 +16,7 @@ export async function GET(request:Request){try{
 const checkout=z.object({requestKey:z.string().uuid(),fingerprint:z.string().length(64),expectedTotal:z.number().int().nonnegative(),fullName:z.string().trim().min(2).max(100),phone:z.string().trim().regex(/^\+?[\d\s()-]{10,20}$/),fulfilment:z.enum(['pickup','delivery']),address:z.string().trim().max(1000).default(''),notes:z.string().trim().max(1000).default(''),consent:z.literal(true)});
 export async function POST(request:Request){try{
  if(!sameOrigin(request))return json({error:'Request origin rejected.'},403);
- const user=await getChatGPTUser();if(!user)return json({error:'Sign in to shop.'},401);
+ const user=await getCustomerUser();if(!user)return json({error:'Sign in to shop.'},401);
  let body;try{body=JSON.parse(new TextDecoder().decode(await limitedBody(request,8000)));}catch{return json({error:'Invalid request.'},400);}
  const db=database();await expireOrders();
  if(body.action==='cart'){

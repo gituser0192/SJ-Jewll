@@ -26,9 +26,9 @@ Checkout currently accepts **unpaid order requests**. It does not collect card p
 
 The app uses Neon project `aged-field-28166908` in organization `org-plain-moon-07813839`. Production uses the `production` branch. PostgreSQL records live in the isolated `sheochand` schema; uploaded photos live in the private `assets` bucket and are served through `/media/<key>`.
 
-`neon.ts` declares the bucket. Postgres is included with the project. Authentication remains the existing ChatGPT sign-in; Neon Auth was not enabled.
+`neon.ts` declares the bucket. Postgres is included with the project. Customers use Neon Auth email/password accounts. The original ChatGPT sign-in remains for the shop owner and customers with records attached to that original account. New email accounts never receive shop-management access.
 
-Run `npx neon@latest deploy` to reconcile services and pull the branch's server-only variables into `.env`. Set these same secrets on the application host: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, and `AWS_REGION`. The unpooled database URL is for migration scripts, not application traffic. Never expose these values with a `NEXT_PUBLIC_` prefix.
+Run `npx neon@latest deploy` to reconcile services and pull the branch's server-only variables into `.env`. Set these same secrets on the application host: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`, `NEON_AUTH_BASE_URL` and `NEON_AUTH_COOKIE_SECRET`. The unpooled database URL is for migration scripts, not application traffic. Never expose these values with a `NEXT_PUBLIC_` prefix.
 
 The runtime uses `@neondatabase/serverless` over HTTPS because the existing Sites Worker runtime does not expose raw TCP or Hyperdrive bindings. Photo requests use `aws4fetch` with S3 SigV4, the injected region, and path-style bucket URLs. Existing `/images` and `/tryon` files remain static site assets.
 
@@ -66,3 +66,13 @@ npm run build
 The shop check requires the verification branch and an empty local test account bag. It tests content persistence, totals, stock reservations, retries and account ownership, then removes its database fixtures and restores the content. The service check proves both services through the app and independently through their database/storage APIs, then removes its own product and photo. Broader fixture checks belong on the disposable branch.
 
 Return to production with `npx neon@latest checkout production`. Restart the local app after changing branch environment variables. Local preview still uses real Neon services on the selected branch.
+
+## Customer login
+
+The public account routes are `/login`, `/signup`, `/forgot-password` and `/reset-password`. The same-origin `/api/auth/*` SDK proxy talks to Managed Neon Auth. Server handlers validate the session before accessing customer bags, orders and try-on. Customer IDs use the `neon:` prefix, keeping them separate from original platform identities. Existing orders are not silently merged by email address; use the original ChatGPT sign-in for those records.
+
+Enable Auth through `neon.ts` and `npx neon@latest deploy`. Register the actual website origin with `npx neon@latest neon-auth domain add <origin>`. Local testing at `http://127.0.0.1:5173` needs that exact origin registered too. Generate a random 32+ character `NEON_AUTH_COOKIE_SECRET` once, retain it in the ignored environment file, and configure it as a hosting secret along with `NEON_AUTH_BASE_URL`.
+
+Password recovery uses Managed Auth's email provider. The shared testing sender is currently configured; delivery has not been verified in a real inbox. Configure business SMTP in Neon Auth before a full production email rollout. Email verification is currently disabled; customer signups cannot grant admin rights. Owner access continues through the existing authorised platform account.
+
+To test authentication safely, create `sheochand-login-verify` from production, register its local origin and run `node --env-file=.env scripts/check-customer-auth.mjs` against the local app. The test creates only disposable accounts with `example.invalid` email addresses. Delete that verification branch after testing. No real email delivery is asserted.
