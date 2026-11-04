@@ -22,21 +22,47 @@ Pending requests reserve stock for 24 hours. Expired or cancelled requests relea
 
 Checkout currently accepts **unpaid order requests**. It does not collect card payments, issue tax invoices, calculate taxes or send order emails. Prices entered in admin are the final customer amounts; only the configured delivery charge is added. The existing consultation-deposit adapter is separate from store orders.
 
+## Neon backend
+
+The app uses Neon project `aged-field-28166908` in organization `org-plain-moon-07813839`. Production uses the `production` branch. PostgreSQL records live in the isolated `sheochand` schema; uploaded photos live in the private `assets` bucket and are served through `/media/<key>`.
+
+`neon.ts` declares the bucket. Postgres is included with the project. Authentication remains the existing ChatGPT sign-in; Neon Auth was not enabled.
+
+Run `npx neon@latest deploy` to reconcile services and pull the branch's server-only variables into `.env`. Set these same secrets on the application host: `DATABASE_URL`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, and `AWS_REGION`. The unpooled database URL is for migration scripts, not application traffic. Never expose these values with a `NEXT_PUBLIC_` prefix.
+
+The runtime uses `@neondatabase/serverless` over HTTPS because the existing Sites Worker runtime does not expose raw TCP or Hyperdrive bindings. Photo requests use `aws4fetch` with S3 SigV4, the injected region, and path-style bucket URLs. Existing `/images` and `/tryon` files remain static site assets.
+
+## Migrations
+
+`db/schema.ts` and `drizzle-postgres/` are the active Drizzle schema and migrations. Generate new migrations with `npm run db:generate`, inspect the SQL, then apply with `npm run db:migrate`. The runner uses the unpooled URL and applies each Drizzle migration atomically with its checksum record. Stock-reservation triggers are included in the initial Postgres migration. Never modify an applied migration.
+
+The historical `drizzle/` SQLite migrations and original D1/R2 resources are retained for reference/recovery; the app no longer uses their bindings. `scripts/import-d1.mjs` imports a complete, private export into empty application tables and copies any referenced `/media/` photographs. It refuses a nonempty destination and records an import marker. No source export or environment secret is committed.
+
 ## Local checks
 
-Run the existing dev server at `http://127.0.0.1:5173`. Local and hosted databases are separate. Migration `0003_glamorous_felicia_hardy.sql` has already been applied to this local preview; do not replay it. Sites applies pending hosted migrations when publishing.
+Use a disposable verification branch before running fixture checks:
 
-With an empty local shopping bag, run:
+```powershell
+npx neon@latest checkout sheochand-neon-verify --create
+npm run db:migrate
+npm run dev
+```
+
+On a branch already cloned from production, migration history and data are inherited. Do not reimport the original D1 export. In a second terminal:
 
 ```powershell
 node scripts/check-money.mjs
-node scripts/check-shop.mjs
+node --env-file=.env scripts/check-shop.mjs
 node scripts/check-login.mjs
 node scripts/check-admin.mjs
 node scripts/check-admin-layout.mjs
 node scripts/check-dev.mjs
 node scripts/check.mjs
+node --env-file=.env scripts/check-neon-services.mjs
 node node_modules/typescript/bin/tsc --noEmit
+npm run build
 ```
 
-The shop check creates temporary local products and orders, tests content persistence, totals, stock reservations, retries and account ownership, then removes its fixtures and restores the content. Never run these fixture checks against production.
+The shop check requires the verification branch and an empty local test account bag. It tests content persistence, totals, stock reservations, retries and account ownership, then removes its database fixtures and restores the content. The service check proves both services through the app and independently through their database/storage APIs, then removes its own product and photo. Broader fixture checks belong on the disposable branch.
+
+Return to production with `npx neon@latest checkout production`. Restart the local app after changing branch environment variables. Local preview still uses real Neon services on the selected branch.

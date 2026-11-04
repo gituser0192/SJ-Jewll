@@ -9,6 +9,6 @@ export const dynamic = 'force-dynamic';
 export default async function TryOn() {
     const user = await getChatGPTUser(); if (!user) redirect('/login?next=%2Ftry-on');
     let products: Product[] = []; let unavailable = false;
-    try { await initialiseTryonAssets(); products = (await database().prepare("SELECT * FROM products WHERE published=1 AND overlay_url<>'' AND kind<>'ring' ORDER BY id").all<Product>()).results; } catch (error) { console.error(error); unavailable = true; }
+    try { await initialiseTryonAssets(); products = (await database().query<Product>("SELECT * FROM sheochand.products WHERE published=1 AND overlay_url<>'' AND kind<>'ring' ORDER BY id",[])).rows; } catch (error) { console.error(error); unavailable = true; }
     return <main className="customer-studio"><header><Brand/><nav><a className="customer-account-link" href="/login">Your account</a><a className="customer-account-link" href={chatGPTSignOutPath('/')} target="_top">Sign out</a></nav></header>{unavailable ? <section className="studio-unavailable"><h1>The studio is temporarily unavailable.</h1><p>Your camera has not been started. Please try again shortly.</p><a className="button" href="/try-on">Try again</a></section> : <Studio products={products} />}<p className="studio-account">Signed in as {user.email} · <a href="/">Return to the collection</a></p></main>;
 }

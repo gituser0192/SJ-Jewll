@@ -13,6 +13,9 @@ process.env.WRANGLER_REGISTRY_PATH ||= path.join(runtimeRoot, "wrangler/dev-regi
 process.env.MINIFLARE_REGISTRY_PATH ||= path.join(runtimeRoot, "wrangler/registry");
 
 process.chdir(projectRoot);
+// Wrangler otherwise resolves this file beside dist/server/wrangler.json.
+const envFileIndex=process.argv.indexOf('--env-file');
+if(envFileIndex!==-1&&process.argv[envFileIndex+1])process.argv[envFileIndex+1]=path.resolve(projectRoot,process.argv[envFileIndex+1]);
 for (const directory of [
   path.dirname(process.env.WRANGLER_LOG_PATH),
   process.env.WRANGLER_REGISTRY_PATH,

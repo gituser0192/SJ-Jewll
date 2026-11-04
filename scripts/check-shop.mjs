@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import {DatabaseSync} from 'node:sqlite';
-import {readdirSync} from 'node:fs';
-import {join} from 'node:path';
+import {neon} from '@neondatabase/serverless';
+assert.equal(process.env.NEON_BRANCH,'sheochand-neon-verify','Run fixture checks only on the Neon verification branch.');
+const postgres=neon(process.env.DATABASE_URL);
 const base=process.env.SJ_BASE_URL??'http://127.0.0.1:5173';assert.match(base,/^http:\/\/(127\.0\.0\.1|localhost):\d+$/,'Shop checks must run against local storage only.');
 const signIn=await fetch(base+'/signin-with-chatgpt?return_to=%2Fcart',{redirect:'manual'}),cookie=signIn.headers.get('set-cookie').split(';')[0];
 async function call(path,body,auth=true,origin=base){const response=await fetch(base+path,{headers:{Origin:origin,...(auth?{Cookie:cookie}:{}),...(body?{'Content-Type':'application/json'}:{})},...(body?{method:'POST',body:JSON.stringify(body)}:{})});const text=await response.text();let data;try{data=JSON.parse(text);}catch{data={error:text};}return {status:response.status,data};}
 const admin=body=>call('/api/admin',body),shop=body=>call('/api/shop',body);
-function sql(command){const directory='.wrangler/state/v3/d1/miniflare-D1DatabaseObject';const files=readdirSync(directory).filter(f=>f.endsWith('.sqlite')&&f!=='metadata.sqlite');assert.equal(files.length,1,'Select the single local preview database.');const db=new DatabaseSync(join(directory,files[0]));try{db.exec('PRAGMA busy_timeout=5000');db.exec(command);}finally{db.close();}}
+async function sql(command){return postgres.query(command.replace(/(FROM|INTO|UPDATE) (orders|products|cart_items)\b/g,'$1 sheochand.$2'));}
 assert.equal((await call('/api/shop',undefined,false)).status,401);
 assert.equal((await call('/api/shop',{action:'cart',id:'sj01',quantity:1},true,'https://wrong.example')).status,403);
 for(const path of ['/cart','/orders']){const response=await fetch(base+path,{redirect:'manual'});assert.equal(response.status,307);assert.match(response.headers.get('location'),/^\/login\?next=/);}
@@ -62,15 +62,15 @@ try{
  // An order under a different owner must remain inaccessible, even with its ID.
  assert.equal((await admin({type:'product',product:{...product,stock:2}})).status,200);
  const other=crypto.randomUUID();orderIds.push(other);
- sql(`INSERT INTO orders(id,owner_id,request_key,full_name,phone,email,fulfilment,address,notes,items,subtotal_paise,shipping_paise,total_paise,status,payment_mode,inventory_state,expires_at,created_at) SELECT '${other}','local_other_customer','${other}',full_name,phone,email,fulfilment,address,notes,items,subtotal_paise,shipping_paise,total_paise,'PENDING','REQUEST','RESERVED',expires_at,created_at FROM orders WHERE id='${successful}'`);
+ await sql(`INSERT INTO orders(id,owner_id,request_key,full_name,phone,email,fulfilment,address,notes,items,subtotal_paise,shipping_paise,total_paise,status,payment_mode,inventory_state,expires_at,created_at) SELECT '${other}','local_other_customer','${other}',full_name,phone,email,fulfilment,address,notes,items,subtotal_paise,shipping_paise,total_paise,'PENDING','REQUEST','RESERVED',expires_at,created_at FROM orders WHERE id='${successful}'`);
  assert.equal((await call('/api/shop?id='+other)).status,404);
  assert.ok(!(await shop()).data.orders.some(o=>o.id===other));
- sql(`UPDATE orders SET expires_at='2000-01-01T00:00:00.000Z' WHERE id='${other}'`);
+ await sql(`UPDATE orders SET expires_at='2000-01-01T00:00:00.000Z' WHERE id='${other}'`);
  await shop();const expired=(await admin()).data.orders.find(o=>o.id===other);assert.equal(expired.status,'EXPIRED');assert.equal(expired.inventory_state,'RELEASED');
  saved=(await admin()).data.products.find(p=>p.id===id);assert.equal(saved.stock,2);assert.equal(saved.reserved,0);
 }finally{
  await shop({action:'cart',id,quantity:0});
- for(const orderId of orderIds){await admin({type:'order',id:orderId,action:'cancel'});sql(`DELETE FROM orders WHERE id='${orderId}'`);}
+ for(const orderId of orderIds){await admin({type:'order',id:orderId,action:'cancel'});await sql(`DELETE FROM orders WHERE id='${orderId}'`);}
  await admin({type:'remove',id});assert.equal((await admin({type:'content',content:original})).status,200);
 }
 console.log('PASS: CMS persistence and validation, protected shopping routes, price/stock checks, exact totals, delivery, idempotency, concurrent stock reservations, cancellation, fulfilment, manual payment and customer order ownership.');
