@@ -1,3 +1,3 @@
 'use client';
-import {createAuthClient} from '@neon/auth/next';
-export const authClient=createAuthClient();
+let client: ReturnType<typeof import('@neon/auth/next').createAuthClient> | undefined;
+export async function getAuthClient(){return client ??= (await import('@neon/auth/next')).createAuthClient();}
