@@ -9,7 +9,7 @@ const admin=body=>call('/api/admin',body),shop=body=>call('/api/shop',body);
 async function sql(command){return postgres.query(command.replace(/(FROM|INTO|UPDATE) (orders|products|cart_items)\b/g,'$1 sheochand.$2'));}
 assert.equal((await call('/api/shop',undefined,false)).status,401);
 assert.equal((await call('/api/shop',{action:'cart',id:'sj01',quantity:1},true,'https://wrong.example')).status,403);
-for(const path of ['/cart','/orders']){const response=await fetch(base+path,{redirect:'manual'});assert.equal(response.status,307);assert.match(response.headers.get('location'),/^\/login\?next=/);}
+for(const path of ['/cart','/checkout','/orders']){const response=await fetch(base+path,{redirect:'manual'});assert.equal(response.status,307);assert.match(response.headers.get('location'),/^\/login\?next=/);}
 const original=(await admin()).data.content,existing=(await shop()).data.items;assert.equal(existing.length,0,'Use an empty local test cart.');
 const id='shop-qa-'+crypto.randomUUID(),category='qa-'+crypto.randomUUID().slice(0,8),orderIds=[];
 let product={id,name:'Shop test jewellery',category,purity:'Test only',description:'Local commerce test fixture',image_url:'/images/earrings.avif',kind:'earrings',published:true,price_status:'On request',overlay_url:'',ar_scale:.22,ar_offset:.02,price_paise:9999,stock:2};
@@ -24,7 +24,10 @@ try{
  assert.equal((await admin({type:'product',product:{...product,price_paise:99.99}})).status,400);
  assert.equal((await admin({type:'product',product})).status,200);
  assert.equal((await admin({type:'content',content:original})).status,400,'Collections in use must be retained.');
- html=await(await fetch(base+'/products/'+id)).text();assert.ok(html.includes('Shop test jewellery'));assert.ok(html.includes('Add to bag'));
+ html=await(await fetch(base+'/products/'+id)).text();assert.ok(html.includes('Shop test jewellery'));assert.ok(html.includes('Add to bag'));assert.ok(html.includes('Enlarge photograph'));assert.ok(html.includes('You may also love.'));
+ html=await(await fetch(base+'/shop')).text();assert.ok(html.includes('Search jewellery'));assert.ok(html.includes('Shop test jewellery'));assert.ok(html.includes('Sort jewellery'));
+ html=await(await fetch(base+'/cart',{headers:{Cookie:cookie}})).text();assert.ok(html.includes('Continue to checkout')||html.includes('Your shopping bag.'));
+ html=await(await fetch(base+'/checkout',{headers:{Cookie:cookie}})).text();assert.ok(html.includes('Checkout'));assert.ok(html.includes('Make it yours.'));
  assert.equal((await shop({action:'cart',id,quantity:21})).status,400);
  assert.equal((await shop({action:'cart',id,quantity:3})).status,409);
  assert.equal((await shop({action:'cart',id,quantity:1,add:true})).status,200);

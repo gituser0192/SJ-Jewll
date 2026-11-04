@@ -76,3 +76,11 @@ Enable Auth through `neon.ts` and `npx neon@latest deploy`. Register the actual 
 Password recovery uses Managed Auth's email provider. The shared testing sender is currently configured; delivery has not been verified in a real inbox. Configure business SMTP in Neon Auth before a full production email rollout. Email verification is currently disabled; customer signups cannot grant admin rights. Owner access continues through the existing authorised platform account.
 
 To test authentication safely, create `sheochand-login-verify` from production, register its local origin and run `node --env-file=.env scripts/check-customer-auth.mjs` against the local app. The test creates only disposable accounts with `example.invalid` email addresses. Delete that verification branch after testing. No real email delivery is asserted.
+
+## Shopping experience
+
+`/shop` is the full catalogue: search, collection and style filters, in-stock ordering filter, price/name sorting, and saved selections (shared with the homepage). Filters are reflected in the URL. Product pages include an enlarged photo, quantity selection, specifications, policies and related pieces. Prices and inventory come from **Collection** in admin; unpriced pieces offer a WhatsApp price enquiry and cannot be ordered. No stock, material claims, reviews or discounts are fabricated.
+
+`/cart` manages quantities and shows totals. `/checkout` collects contact and pickup/delivery details and requires consent before an unpaid order request is created. Checkout is available only to signed-in customers. Delivery is shown only when enabled in Website content. Order pages show progress, payment status, dispatch/pickup notes and a printable order summary. Shop confirmation and recording of payment still happen under Customer orders in admin.
+
+Before launch, add verified final prices and stock to the real products, replace illustrative catalogue copy, and complete business contact and shop policies. This checkout does not collect online payments.
