@@ -2317,3 +2317,16 @@ footer a:hover {
 @media(max-width:1000px){.home-header{column-gap:20px}.header-chain{opacity:.9}}
 @media(max-width:600px){.home-header{grid-template-columns:auto auto;justify-content:space-between;column-gap:10px}.header-chain{display:none}}
 @media(prefers-reduced-motion:reduce){.header-chain-motion,.header-chain-glint{display:none}.header-chain-still{display:block}}
+
+/* Keep the square banner complete, without side bars or a below-fold pendant. */
+.hero{--hero-size:min(50vw,calc(100svh - var(--hero-chrome,140px)));grid-template-columns:minmax(0,1fr) var(--hero-size);height:var(--hero-size);min-height:0;align-items:stretch}
+.hero-photo{min-height:0;aspect-ratio:1;width:100%;height:100%;background:transparent}
+.hero-photo>img{object-fit:contain;transform:none}
+.hero-copy{min-width:0;display:flex;flex-direction:column;justify-content:center;padding:clamp(20px,4svh,60px) clamp(28px,5vw,100px)}
+.hero h1{font-size:clamp(32px,min(4.5vw,7.7svh),76px);line-height:1.06;margin:0 0 clamp(15px,2.5svh,28px)}
+.hero .eyebrow{align-self:flex-start;max-width:100%;font-size:clamp(8px,.7vw,11px);line-height:1.6;margin:0 0 clamp(16px,3svh,28px)}
+.hero-copy>p:not(.eyebrow){font-size:clamp(12px,1vw,15px);line-height:1.75;margin:0 0 clamp(20px,3svh,32px)}
+.hero-copy .actions{flex-wrap:wrap;gap:18px}
+.hero-copy .button{font-size:13px;padding:15px 23px}
+.hero-copy .text-link{font-size:12px}
+@media(max-width:760px){.hero{grid-template-columns:1fr;height:auto}.hero-photo{width:100%;height:auto;min-height:0;aspect-ratio:1}.hero-copy{padding:50px 7%}.hero h1{font-size:clamp(36px,9vw,52px)}.hero .eyebrow{font-size:9px;margin-bottom:24px}.hero-copy>p:not(.eyebrow){font-size:14px;margin-bottom:26px}}

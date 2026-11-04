@@ -13,6 +13,13 @@ import HeaderChain from './header-chain';
 async function api(action:string,body?:unknown){const response=await fetch('/api/'+action,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{cache:'no-store'});const result:any=await response.json();if(!response.ok)throw new Error(result.error??'Please try again.');return result;}
 export default function Home({account}:{account:{displayName:string;email:string}|null}){
 const {content,categories,whatsapp}=useSite();
+useEffect(()=>{
+ const hero=document.querySelector<HTMLElement>('.hero'),header=document.querySelector<HTMLElement>('.home-header'),announcement=document.querySelector<HTMLElement>('.announcement');
+ if(!hero||!header||!announcement)return;
+ const measure=()=>hero.style.setProperty('--hero-chrome',(header.offsetHeight+announcement.offsetHeight)+'px');
+ const observer=new ResizeObserver(measure);observer.observe(header);observer.observe(announcement);measure();return()=>observer.disconnect();
+},[]);
+
 const [products,setProducts]=useState<Product[]>([]),[loading,setLoading]=useState(true),[catalogError,setCatalogError]=useState(''),[category,setCategory]=useState('all'),[saved,setSaved]=useState<string[]>([]),[saving,setSaving]=useState(false),[rate,setRate]=useState<any>(null),[interest,setInterest]=useState('Bespoke consultation'),[formBusy,setFormBusy]=useState(false),[leadId,setLeadId]=useState(''),[code,setCode]=useState('SJ-2036-POLKI-8842'),[certificate,setCertificate]=useState<any>(null),[vaultError,setVaultError]=useState(''),[vaultBusy,setVaultBusy]=useState(false),[chatOpen,setChatOpen]=useState(false),[chatBusy,setChatBusy]=useState(false),[message,setMessage]=useState(''),[messages,setMessages]=useState([{role:'assistant',text:'Welcome to Sheochand. Ask about our legacy, styling or arranging a consultation. This guide uses prepared answers unless AI is connected.'}]);
 async function load(){setLoading(true);setCatalogError('');try{const results=await Promise.allSettled([api('catalog'),api('wishlist'),api('rates')]);if(results[0].status==='fulfilled')setProducts(results[0].value.products);else setCatalogError(results[0].reason.message);if(results[1].status==='fulfilled')setSaved(results[1].value.items);if(results[2].status==='fulfilled')setRate(results[2].value.rate);}finally{setLoading(false);}}
 useEffect(()=>{void load();const interval=setInterval(()=>{api('rates').then(r=>setRate(r.rate)).catch(()=>setRate(null));},60000);return()=>clearInterval(interval);},[]);
