@@ -14,3 +14,20 @@ assert.deepEqual(pieces.map(p=>p.id),['a','b','c']);
 for(const path of ['/shop','/checkout','/products/sj-01'])assert.equal(customerReturnPath(path),path);
 for(const path of ['//evil.example','https://evil.example','/products/../admin','/checkout?next=bad'])assert.equal(customerReturnPath(path),'/try-on');
 console.log('PASS: combined catalogue filters, unpriced sorting, reserved-stock availability, immutable input and safe shopping login destinations.');
+
+const types=await import('../lib/jewellery-types.ts');
+const categorized=types.jewelleryTypes.map(t=>({id:t.id,name:'A lovely piece',description:'Handcrafted',purity:'Specifications on enquiry',category:'gold',kind:t.id}));
+for(const t of types.jewelleryTypes){
+ assert.deepEqual(filterProducts(categorized,{...defaults,kind:t.id}).map(p=>p.id),[t.id]);
+ assert.ok(filterProducts(categorized,{...defaults,q:t.search.split(' ').at(-1)}).some(p=>p.kind===t.id));
+}
+assert.deepEqual(filterProducts(categorized,{...defaults,q:'earings'}).map(p=>p.id),['earrings']);
+assert.deepEqual(filterProducts(categorized,{...defaults,q:'mangalsutar'}).map(p=>p.id),['mangalsutra']);
+const {productInput}=await import('../lib/product-input.ts');
+const input={id:'test',name:'Test piece',category:'gold',description:'A real piece',purity:'Details on enquiry',image_url:'/images/gold.avif',price_status:'On request',published:true,overlay_url:'',ar_scale:1,ar_offset:0};
+for(const kind of types.productKinds){
+ assert.equal(productInput.safeParse({...input,kind}).success,true);
+ assert.equal(productInput.safeParse({...input,kind,overlay_url:'/tryon/pearl-necklace.png'}).success,types.faceTryOn(kind));
+}
+assert.equal(productInput.safeParse({...input,kind:'unknown'}).success,false);
+console.log('PASS: all jewellery types, category search aliases, admin validation and unsupported camera-overlay rejection.');

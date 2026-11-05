@@ -1,4 +1,5 @@
 'use client';
+import {faceTryOn} from '@/lib/jewellery-types';
 import {useEffect,useRef,useState} from 'react';
 import {Camera,CameraOff,Download,SlidersHorizontal} from 'lucide-react';
 import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from '@/components/ui/select';
@@ -10,7 +11,7 @@ export default function Studio({products}:{products:Product[]}){
  const {whatsapp}=useSite();
  const video=useRef<HTMLVideoElement>(null),canvas=useRef<HTMLCanvasElement>(null),cleanup=useRef(()=>{}),generation=useRef(0),sprite=useRef<HTMLCanvasElement|null>(null),current=useRef<Product|null>(null),fit=useRef({scale:1,offset:0});
  const [active,setActive]=useState(false),[busy,setBusy]=useState(false),[assetBusy,setAssetBusy]=useState(false),[status,setStatus]=useState('Your camera stays on your device.'),[item,setItem]=useState(''),[fitScale,setFitScale]=useState(1),[fitOffset,setFitOffset]=useState(0),[adjust,setAdjust]=useState(false),[snapshot,setSnapshot]=useState('');
- const eligible=products.filter(p=>p.kind!=='ring'&&p.overlay_url);const piece=eligible.find(p=>p.id===item)??eligible[0];current.current=piece??null;fit.current={scale:fitScale,offset:fitOffset};
+ const eligible=products.filter(p=>faceTryOn(p.kind)&&p.overlay_url);const piece=eligible.find(p=>p.id===item)??eligible[0];current.current=piece??null;fit.current={scale:fitScale,offset:fitOffset};
  useEffect(()=>{let cancelled=false;sprite.current=null;if(!piece?.overlay_url)return;setAssetBusy(true);setFitScale(1);setFitOffset(0);loadCutout(piece.overlay_url).then(image=>{if(!cancelled){sprite.current=image;setStatus('Photographic filter ready. Start the camera to try it on.');}}).catch(error=>{if(!cancelled)setStatus((error as Error).message);}).finally(()=>{if(!cancelled)setAssetBusy(false);});return()=>{cancelled=true;};},[piece?.id,piece?.overlay_url]);
  function stop(){generation.current++;cleanup.current();setActive(false);setBusy(false);setStatus('Camera off. Your video was not uploaded.');}
  useEffect(()=>()=>{generation.current++;cleanup.current();},[]);
