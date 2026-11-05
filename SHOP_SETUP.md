@@ -103,3 +103,5 @@ Apply migration `0001_aromatic_mercury` before deploying this feature. It adds t
 
 ### Jewellery type pages
 The menu, homepage collection and shop list link to separate pages for Earrings, Payal, Mangalsutra, Artificial Jewellery, Bracelets, Chains, Necklaces and Rings. In Admin → Collection → Add/Edit piece, set **Jewellery type** and publish. This decides which type page shows the piece; the existing Collection field still controls the gold/silver/bespoke/editorial collection. Choose Artificial Jewellery for imitation pieces. Pages show only published products of their assigned type, with honest empty states until products are added. Camera overlays remain available only for necklaces and earrings.
+
+The shared shop navigation now opens All jewellery sections on mouse hover, click or keyboard. Its compact search searches the entire published catalogue. Admin Collection includes a jewellery-type filter; Add/Edit piece shows the All jewellery and type-page destinations, and both update when the product is saved as Published. Changing the type moves its category-page placement; it remains on All jewellery.
