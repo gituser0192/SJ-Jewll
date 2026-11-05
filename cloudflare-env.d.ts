@@ -1,5 +1,6 @@
 declare namespace Cloudflare {
  interface Env {
+  ADMIN_NEON_USER_ID?:string;
   DATABASE_URL?:string;
   NEON_AUTH_BASE_URL?:string;
   NEON_AUTH_COOKIE_SECRET?:string;

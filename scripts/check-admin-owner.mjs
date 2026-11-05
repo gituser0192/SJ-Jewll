@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {canManageShop,isPinnedOwner} from '../lib/auth/admin-policy.ts';
+const email='owner@example.invalid',id='pinned-owner',owner={id,email,emailVerified:true};
+assert.equal(canManageShop(owner,email,id),true);
+assert.equal(canManageShop({...owner,email:' OWNER@example.invalid '},email,id),true);
+for(const user of [null,{...owner,emailVerified:false},{...owner,emailVerified:undefined},{...owner,id:'different-id'},{...owner,email:'other@example.invalid'}])assert.equal(canManageShop(user,email,id),false);
+for(const config of [[email,undefined],[undefined,id],['',id],[email,'']])assert.equal(canManageShop(owner,...config),false);
+assert.equal(isPinnedOwner({...owner,emailVerified:false},email,id),true);
+assert.equal(isPinnedOwner({...owner,id:'recreated-email-account'},email,id),false);
+console.log('PASS: only the pinned, verified owner can manage the shop; wrong IDs, unverified email and missing configuration are denied.');

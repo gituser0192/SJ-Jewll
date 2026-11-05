@@ -84,3 +84,11 @@ To test authentication safely, create `sheochand-login-verify` from production, 
 `/cart` manages quantities and shows totals. `/checkout` collects contact and pickup/delivery details and requires consent before an unpaid order request is created. Checkout is available only to signed-in customers. Delivery is shown only when enabled in Website content. Order pages show progress, payment status, dispatch/pickup notes and a printable order summary. Shop confirmation and recording of payment still happen under Customer orders in admin.
 
 Before launch, add verified final prices and stock to the real products, replace illustrative catalogue copy, and complete business contact and shop policies. This checkout does not collect online payments.
+
+## Owner account and shop overview
+
+The email/password owner is pinned by **both** `ADMIN_NEON_USER_ID` and `ADMIN_EMAIL` hosting secrets. The email must be verified before the dashboard or any admin API is available. A recreated account with the same email is not automatically trusted. Open `/admin`, sign in, request a code and verify your owner email once. The code is issued and checked by Neon Auth; never set `emailVerified` manually. The original authorised ChatGPT owner sign-in remains available. An active non-owner email session does not inherit permissions from a different platform session.
+
+Overview shows published pieces, pending orders, new consultations, orderable stock, shop readiness and recent orders. Collection, Website content, Customer orders, Consultations and Gold & silver rates remain the management workspaces. Sign-out clears both customer and platform sessions.
+
+Run `node scripts/check-admin-owner.mjs` to check owner authorization. The owner's real email verification and inbox delivery must be completed by the owner; automated tests do not change that account or read its codes.
