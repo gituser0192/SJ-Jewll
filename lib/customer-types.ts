@@ -1,0 +1,2 @@
+export type CustomerStats={customers:number;new_customers:number;signins:number;signins_today:number;active_sessions:number;pending_orders:number;tracking_started_at:string|null};
+export type CustomerProfile={owner_id:string;name:string;email:string;verified:boolean|null;joined_at:string;source:'email'|'orders';order_count:number;paid_paise:number;last_order_at:string|null;phone:string|null;signins:number;last_signin_at:string|null;last_session_at:string|null};

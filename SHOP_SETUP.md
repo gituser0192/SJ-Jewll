@@ -92,3 +92,11 @@ The email/password owner is pinned by **both** `ADMIN_NEON_USER_ID` and `ADMIN_E
 Overview shows published pieces, pending orders, new consultations, orderable stock, shop readiness and recent orders. Collection, Website content, Customer orders, Consultations and Gold & silver rates remain the management workspaces. Sign-out clears both customer and platform sessions.
 
 Run `node scripts/check-admin-owner.mjs` to check owner authorization. The owner's real email verification and inbox delivery must be completed by the owner; automated tests do not change that account or read its codes.
+
+## Customers, login counts and order history
+
+The owner-only **Customers & logins** workspace shows customer profiles, new accounts in the last 30 days, recorded email/password sign-ins, valid-until-expiry session counts, contact details and each customer's paginated order history. Search by name, email or phone. Customer profiles keep Neon account IDs separate from original order-account IDs; records are never merged just because emails match. The configured owner is excluded from customer metrics. Orders without a current Neon account remain visible as order contacts.
+
+The app records successful `/sign-in/email` and `/sign-up/email` responses in `sheochand.login_events`. It stores only user ID, event kind and timestamp. Signup events are separate from sign-ins, and session reads never increment the login count. Passwords, session tokens, IP addresses and browser fingerprints are not recorded. Reporting failures do not block a successful sign-in; the worker logs a generic error for investigation. Historical login totals are not reconstructed: `login_tracking_started_at` marks when collection began. Original platform sign-ins and other providers are outside this email/password counter.
+
+Apply migration `0001_aromatic_mercury` before deploying this feature. It adds the app-owned event table, indexes and tracking-start setting without modifying managed Auth tables. `node scripts/check-customer-reports.mjs` checks event classification and reporting boundaries. Database queries were exercised on the disposable `sheochand-crm-verify` branch with new-account, original-account, paid/unpaid-order and sign-in fixtures; that branch expires automatically.
