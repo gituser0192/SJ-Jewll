@@ -2312,12 +2312,6 @@ footer a:hover {
 @media(max-width:760px){.home-header{height:82px;padding:0 5%;gap:10px}.home-header .brand{font-size:28px;gap:9px}.home-header .brand span{font-size:14px;letter-spacing:2px}.home-header .brand small{font-size:7px;letter-spacing:1.4px}.home-header>nav{gap:14px}.home-header>nav>.home-shop-link,.home-header>nav>.home-studio-link{display:none!important}.home-header .store-bag-link{padding:4px 0 4px 13px!important;gap:4px!important;font-size:10px}.home-header .store-bag-link>span{display:none}.home-header .store-bag-link svg{width:19px}.home-header .icon-button>span{font-size:10px}.home-header .home-menu-trigger>span{display:none}.home-header .home-menu-trigger{padding:7px 0}.home-header .icon-button{gap:5px}.home-navigation-panel[data-slot=sheet-content]{width:min(420px,100vw);padding:28px 26px 20px}.navigation-panel-intro{padding:24px 0 22px}.navigation-panel-intro [data-slot=sheet-title]{font-size:33px}.home-navigation-links>a{padding:18px 0}.home-navigation-links span{font-size:26px}.navigation-panel-secondary{gap:14px;padding:23px 0}}
 @media(max-width:360px){.home-header .brand span{font-size:12px;letter-spacing:1.4px}.home-header>nav{gap:10px}.home-header .brand{font-size:25px;gap:7px}}
 
-/* A travelling gold-link loop uses only the header's free centre column. */
-.home-header{display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:clamp(20px,3vw,58px)}.home-header>.brand,.home-header>nav{min-width:0}.header-chain{width:100%;max-width:460px;justify-self:center;align-self:center;pointer-events:none;overflow:hidden;line-height:0}.header-chain svg{display:block;width:100%;max-height:88px;overflow:visible}.header-chain-still{display:none}.header-chain-glint{filter:drop-shadow(0 0 3px #f6d777)}
-@media(max-width:1000px){.home-header{column-gap:20px}.header-chain{opacity:.9}}
-@media(max-width:600px){.home-header{grid-template-columns:auto auto;justify-content:space-between;column-gap:10px}.header-chain{display:none}}
-@media(prefers-reduced-motion:reduce){.header-chain-motion,.header-chain-glint{display:none}.header-chain-still{display:block}}
-
 /* Keep the square banner complete, without side bars or a below-fold pendant. */
 .hero{--hero-size:min(50vw,calc(100svh - var(--hero-chrome,140px)));grid-template-columns:minmax(0,1fr) var(--hero-size);height:var(--hero-size);min-height:0;align-items:stretch}
 .hero-photo{min-height:0;aspect-ratio:1;width:100%;height:100%;background:transparent}
