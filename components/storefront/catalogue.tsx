@@ -1,4 +1,5 @@
 'use client';
+import TryOnBadge from './tryon-badge';
 import {jewelleryTypes,productKinds} from '@/lib/jewellery-types';
 import {useEffect,useState} from 'react';
 import {ArrowRight,SlidersHorizontal,X,Heart} from 'lucide-react';
@@ -8,7 +9,7 @@ import {useSite} from './site-provider';
 import {AddToCart} from './shop';
 export function ProductCard({product:p,saved,onSave}:{product:Product;saved?:boolean;onSave?:(id:string)=>void}){
  const {content}=useSite();const priced=(p.price_paise??0)>0,available=(p.stock??0)-(p.reserved??0)>0;
- return <article className="store-product"><div className="store-product-photo"><a href={'/products/'+p.id} aria-label={'View '+p.name}><img src={p.image_url} alt={p.name} loading="lazy"/></a><span className="piece-badge">{!priced?'Price on request':available?'Available to order':'Sold out'}</span>{onSave&&<button className={'store-save '+(saved?'saved':'')} onClick={()=>onSave(p.id)} aria-label={(saved?'Unsave ':'Save ')+p.name} aria-pressed={!!saved}><Heart size={18} fill={saved?'currentColor':'none'}/></button>}</div><div className="store-product-info"><p className="eyebrow">{content.collections.find(c=>c.id===p.category)?.label}</p><h2><a href={'/products/'+p.id}>{p.name}</a></h2><p className="store-product-material">{p.purity}</p><AddToCart product={p} compact/><a className="store-details" href={'/products/'+p.id}>Discover this piece <ArrowRight size={15}/></a></div></article>;
+ return <article className="store-product"><div className="store-product-photo"><a href={'/products/'+p.id} aria-label={'View '+p.name}><img src={p.image_url} alt={p.name} loading="lazy"/></a><TryOnBadge product={p}/><span className="piece-badge">{!priced?'Price on request':available?'Available to order':'Sold out'}</span>{onSave&&<button className={'store-save '+(saved?'saved':'')} onClick={()=>onSave(p.id)} aria-label={(saved?'Unsave ':'Save ')+p.name} aria-pressed={!!saved}><Heart size={18} fill={saved?'currentColor':'none'}/></button>}</div><div className="store-product-info"><p className="eyebrow">{content.collections.find(c=>c.id===p.category)?.label}</p><h2><a href={'/products/'+p.id}>{p.name}</a></h2><p className="store-product-material">{p.purity}</p><AddToCart product={p} compact/><a className="store-details" href={'/products/'+p.id}>Discover this piece <ArrowRight size={15}/></a></div></article>;
 }
 export default function Catalogue({products,initial,section}:{products:Product[];initial:Record<string,string>;section?:typeof jewelleryTypes[number]}){
  const {content}=useSite(),defaults:ShopFilters={q:'',category:'all',kind:section?.id??'all',availability:'all',sort:'featured'};

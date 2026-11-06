@@ -11,7 +11,7 @@ export function smoothPose(previous:Pose|null,next:Pose,amount:number):Pose{
 }
 export function drawJewellery(context:CanvasRenderingContext2D,image:CanvasImageSource&{width:number;height:number},pose:Pose,kind:string,scale:number,offset:number,brightness=1){
  const {width,roll,yaw}=pose;context.save();context.filter=`brightness(${brightness}) drop-shadow(0px 2px 2px rgba(35,20,8,0.24))`;
- function draw(x:number,y:number,w:number,flip=false,opacity=1){const h=w*image.height/image.width;context.save();context.translate(x,y);context.rotate(roll*.85);context.scale(flip?-1:1,1);context.globalAlpha=opacity;context.drawImage(image,-w/2,0,w,h);context.restore();}
+ function draw(x:number,y:number,w:number,flip=false,opacity=1){const h=w*image.height/image.width;context.save();context.translate(x,y);context.rotate(roll*.85);context.scale(flip?-1:1,1);context.globalAlpha*=opacity;context.drawImage(image,-w/2,0,w,h);context.restore();}
  if(kind==='earrings'){
   const size=width*scale;
   // Far-side earrings fade as the face turns, avoiding an obvious floating sticker.

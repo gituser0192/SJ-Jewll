@@ -9,4 +9,4 @@ export const jewelleryTypes = [
  {id:'ring',slug:'rings',label:'Rings',search:'ring rings'},
 ] as const;
 export const productKinds = ['necklace','earrings','ring','payal','mangalsutra','artificial','bracelet','chain'] as const;
-export const faceTryOn = (kind:string) => kind==='necklace'||kind==='earrings';
+export const faceTryOn = (kind:string) => ['necklace','earrings','chain','mangalsutra'].includes(kind);

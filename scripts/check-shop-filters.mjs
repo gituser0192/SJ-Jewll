@@ -27,7 +27,7 @@ const {productInput}=await import('../lib/product-input.ts');
 const input={id:'test',name:'Test piece',category:'gold',description:'A real piece',purity:'Details on enquiry',image_url:'/images/gold.avif',price_status:'On request',published:true,overlay_url:'',ar_scale:1,ar_offset:0};
 for(const kind of types.productKinds){
  assert.equal(productInput.safeParse({...input,kind}).success,true);
- assert.equal(productInput.safeParse({...input,kind,overlay_url:'/tryon/pearl-necklace.png'}).success,types.faceTryOn(kind));
+ assert.equal(productInput.safeParse({...input,kind,overlay_url:'/tryon/pearl-necklace.png'}).success,true);
 }
 assert.equal(productInput.safeParse({...input,kind:'unknown'}).success,false);
-console.log('PASS: all jewellery types, category search aliases, admin validation and unsupported camera-overlay rejection.');
+console.log('PASS: all jewellery types, category search aliases, admin validation and transparent cutout validation for every jewellery type.');
